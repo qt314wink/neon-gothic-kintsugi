@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Gothic Kintsugi Spirit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-pink: #ff1493;
+    --neon-purple: #bf00ff;
+    --deep-purple: #1a001f;
+    --crimson: #8b0000;
+    --obsidian: #0a0a0a;
+    --glass-pink: rgba(255, 20, 147, 0.12);
+    --glass-purple: rgba(191, 0, 255, 0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--obsidian);
+  }
+
+  body {
+    font-family: 'Crimson Text', serif;
+    background: var(--obsidian);
+    color: #e8dce0;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Fullscreen Canvas Background */
+  #cathedral-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* SVG Kintsugi Overlay */
+  #kintsugi-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.55;
+  }
+
+  #kintsugi-overlay path {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--neon-pink)) drop-shadow(0 0 12px var(--neon-purple));
+  }
+
+  /* Particle Canvas */
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Content Wrapper */
+  .content {
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .content > * { pointer-events: auto; }
+
+  /* Hero Section */
+  .hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, var(--neon-pink) 0%, #ff69b4 30%, var(--neon-purple) 70%, #9400d3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.5)) drop-shadow(0 0 40px rgba(191, 0, 255, 0.3));
+    animation: neonPulse 4s ease-in-out infinite;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(1rem, 3vw, 1.8rem);
+    color: #c8a0b8;
+    margin-top: 1rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(191, 0, 255, 0.4);
+  }
+
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: #a06090;
+    text-transform: uppercase;
+    animation: fadeBounce 2.5s ease-in-out infinite;
+  }
+
+  @keyframes neonPulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.5)) drop-shadow(0 0 40px rgba(191, 0, 255, 0.3)); }
+    50% { filter: drop-shadow(0 0 30px rgba(255, 20, 147, 0.8)) drop-shadow(0 0 60px rgba(191, 0, 255, 0.5)); }
+  }
+
+  @keyframes fadeBounce {
+    0%, 100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(10px); }
+  }
+
+  /* Narrative Sections */
+  .narrative-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem 2rem;
+    position: relative;
+  }
+
+  .narrative-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 0%, var(--obsidian) 90%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .section-number {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 6rem;
+    color: var(--neon-pink);
+    opacity: 0.15;
+    line-height: 1;
+    margin-bottom: -1.5rem;
+    text-shadow: 0 0 30px var(--neon-purple);
+  }
+
+  .section-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: #f0d0e0;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(255, 20, 147, 0.4), 0 0 30px rgba(191, 0, 255, 0.2);
+  }
+
+  .section-body {
+    max-width: 680px;
+    font-size: 1.25rem;
+    line-height: 1.9;
+    color: #c8a8b8;
+    text-align: center;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+  }
+
+  .section-body em {
+    color: #e8a0c0;
+    font-style: italic;
+  }
+
+  /* Decorative rose window element */
+  .rose-window {
+    width: 180px; height: 180px;
+    margin: 2rem auto;
+    opacity: 0.6;
+    animation: slowRotate 30s linear infinite;
+  }
+
+  @keyframes slowRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Horizontal rule */
+  .gothic-rule {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-pink), var(--neon-purple), transparent);
+    margin: 2rem auto;
+    box-shadow: 0 0 8px var(--neon-pink);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #604060;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .narrative-section { padding: 4rem 1.5rem; }
+    .section-body { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background Layers -->
+<canvas id="cathedral-canvas"></canvas>
+<svg id="kintsugi-overlay" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="crackGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff1493" />
+      <stop offset="50%" stop-color="#ff69b4" />
+      <stop offset="100%" stop-color="#bf00ff" />
+    </linearGradient>
+    <linearGradient id="crackGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bf00ff" />
+      <stop offset="50%" stop-color="#ff1493" />
+      <stop offset="100%" stop-color="#9400d3" />
+    </linearGradient>
+  </defs>
+  <!-- Kintsugi crack network -->
+  <path d="M200,150 Q280,300 250,500 T300,850" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M250,500 Q400,480 520,520 T750,480" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+  <path d="M520,520 Q540,650 500,800 T480,1000" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M300,850 Q450,900 600,880 T850,920" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+  <path d="M850,920 Q900,750 880,600 T920,350" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M920,350 Q1050,400 1180,350 T1400,380" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+  <path d="M1180,350 Q1220,200 1200,80" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M1400,380 Q1450,550 1380,720 T1420,950" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+  <path d="M1380,720 Q1520,700 1650,750 T1780,680" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M1650,750 Q1680,880 1620,1000" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+  <path d="M750,480 Q850,300 900,150" stroke="url(#crackGrad1)" class="kintsugi-crack" />
+  <path d="M600,880 Q700,750 680,620" stroke="url(#crackGrad2)" class="kintsugi-crack" />
+</svg>
+<canvas id="particle-canvas"></canvas>
+
+<!-- Content -->
+<div class="content">
+
+  <section class="hero">
+    <h1 class="hero-title">Neon Gothic</h1>
+    <p class="hero-subtitle">Kintsugi Spirit</p>
+    <div class="gothic-rule" style="margin-top:2rem;"></div>
+    <p class="hero-scroll-indicator">Descend into the cathedral</p>
+  </section>
+
+  <section class="narrative-section" id="fracture">
+    <div class="section-number">I</div>
+    <h2 class="section-title">The Fracture Icon</h2>
+    <div class="gothic-rule"></div>
+    <p class="section-body">
+      She was carved from the blackest marble of a cathedral that never knew sunlight.
+      Her skin, once smooth as obsidian prayer, now bears the map of every shattering.
+      <em>The saints do not weep here.</em> They fracture with dignity, holding their
+      brokenness like stained glass holds light — not despite the cracks, but through them.
+      Each fissure is a scripture written in voltage and velvet shadow.
+    </p>
+    <svg class="rose-window" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.5"/>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#bf00ff" stroke-width="0.5" opacity="0.5"/>
+      <circle cx="50" cy="50" r="15" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.5"/>
+      <line x1="50" y1="5" x2="50" y2="95" stroke="#bf00ff" stroke-width="0.5" opacity="0.4"/>
+      <line x1="5" y1="50" x2="95" y2="50" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+      <line x1="18" y1="18" x2="82" y2="82" stroke="#bf00ff" stroke-width="0.5" opacity="0.4"/>
+      <line x1="82" y1="18" x2="18" y2="82" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+  </section>
+
+  <section class="narrative-section" id="repair">
+    <div class="section-number">II</div>
+    <h2 class="section-title">The Neon Repair</h2>
+    <div class="gothic-rule"></div>
+    <p class="section-body">
+      Where others would seal the wound with gold, she braids hers with neon.
+      Pink plasma threads through obsidian veins; electric purple hums in the hollows.
+      The kintsugi of cathedrals is not restoration to an unbroken state —
+      it is the radical acceptance that beauty and damage are inseparable sacraments.
+      <em>Every crack is a circuit. Every scar, a light source.</em>
+      She glows from within like a reliquary powered by grief transformed.
+    </p>
+    <svg class="rose-window" viewBox="0 0 100 100">
+      <polygon points="50,5 61,39 97,39 68,61 79,95 50,73 21,95 32,61 3,39 39,39" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+      <polygon points="50,20 56,38 74,38 60,49 66,67 50,56 34,67 40,49 26,38 44,38" fill="none" stroke="#bf00ff" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+  </section>
+
+  <section class="narrative-section" id="bloom">
+    <div class="section-number">III</div>
+    <h2 class="section-title">The Sacred Bloom</h2>
+    <div class="gothic-rule"></div>
+    <p class="section-body">
+      From the incense-thick dark, petals begin their slow pilgrimage upward.
+      Crimson and violet, they drift through the neon haze like offerings
+      made by an invisible hand. The repaired icon does not merely endure;
+      she <em>blossoms</em> from her own fractures, each petal a testament
+      to what survives the breaking. In the cathedral of perpetual midnight,
+      bloom is not a season — it is a defiance. A neon-lit resurrection
+      written in smoke, stone, and stubborn, gorgeous light.
+    </p>
+    <svg class="rose-window" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="10" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.6"/>
+      <circle cx="50" cy="50" r="25" fill="none" stroke="#bf00ff" stroke-width="0.5" opacity="0.5"/>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+      <path d="M50,10 Q60,30 50,50 Q40,30 50,10" fill="none" stroke="#bf00ff" stroke-width="0.5" opacity="0.4"/>
+      <path d="M90,50 Q70,60 50,50 Q70,40 90,50" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+      <path d="M50,90 Q40,70 50,50 Q60,70 50,90" fill="none" stroke="#bf00ff" stroke-width="0.5" opacity="0.4"/>
+      <path d="M10,50 Q30,40 50,50 Q30,60 10,50" fill="none" stroke="#ff1493" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+  </section>
+
+  <footer>
+    <p>Touch the dark to summon light &middot; Click to scatter rose petals</p>
+  </footer>
+
+</div>
+
+<script type="module">
+import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+import { ScrollTrigger } from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js';
+gsap.registerPlugin(ScrollTrigger);
+
+/* ========== AUDIO ========== */
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playBellChant() {
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const now = audioCtx.currentTime;
+  // Deep bell: low sine with slow decay
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(55, now); // A1
+  osc.frequency.exponentialRampToValueAtTime(45, now + 4);
+  gain.gain.setValueAtTime(0.25, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 5);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 5.2);
+
+  // Subtle harmonic overtone
+  const osc2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.type = 'triangle';
+  osc2.frequency.setValueAtTime(110, now);
+  gain2.gain.setValueAtTime(0.06, now);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+  osc2.connect(gain2);
+  gain2.connect(audioCtx.destination);
+  osc2.start(now);
+  osc2.stop(now + 3.7);
+
+  // Low chant drone
+  const osc3 = audioCtx.createOscillator();
+  const gain3 = audioCtx.createGain();
+  osc3.type = 'sawtooth';
+  osc3.frequency.setValueAtTime(65, now);
+  gain3.gain.setValueAtTime(0.04, now);
+  gain3.gain.exponentialRampToValueAtTime(0.001, now + 6);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(300, now);
+  osc3.connect(filter);
+  filter.connect(gain3);
+  gain3.connect(audioCtx.destination);
+  osc3.start(now);
+  osc3.stop(now + 6.2);
+}
+
+/* ========== CATHEDRAL CANVAS ========== */
+const catCanvas = document.getElementById('cathedral-canvas');
+const catCtx = catCanvas.getContext('2d');
+let W, H;
+
+function resizeCathedral() {
+  W = catCanvas.width = window.innerWidth;
+  H = catCanvas.height = window.innerHeight;
+}
+resizeCathedral();
+window.addEventListener('resize', resizeCathedral);
+
+const ribs = [];
+const ribCount = 7;
+for (let i = 0; i < ribCount; i++) {
+  ribs.push({
+    x: (i + 1) / (ribCount + 1),
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.15 + Math.random() * 0.2,
+    amp: 30 + Math.random() * 50
+  });
+}
+
+const lightRays = [];
+for (let i = 0; i < 5; i++) {
+  lightRays.push({
+    angle: (Math.PI / 6) + Math.random() * (Math.PI / 3),
+    width: 40 + Math.random() * 80,
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.08 + Math.random() * 0.12,
+    x: Math.random() * 0.6 + 0.2,
+    hue: Math.random() > 0.5 ? 320 : 280 // pink or purple
+  });
+}
+
+let mouseX = W / 2, mouseY = H / 2;
+window.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+let time = 0;
+function drawCathedral() {
+  catCtx.fillStyle = '#0a0a0a';
+  catCtx.fillRect(0, 0, W, H);
+
+  // Subtle deep purple vignette
+  const vig = catCtx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.9);
+  vig.addColorStop(0, 'rgba(26,0,31,0.3)');
+  vig.addColorStop(1, 'rgba(10,10,10,0.95)');
+  catCtx.fillStyle = vig;
+  catCtx.fillRect(0, 0, W, H);
+
+  time += 0.008;
+
+  // Draw rib vaults
+  catCtx.save();
+  catCtx.globalCompositeOperation = 'screen';
+  for (const rib of ribs) {
+    const baseX = rib.x * W;
+    const sway = Math.sin(time * rib.speed + rib.phase) * rib.amp;
+    catCtx.beginPath();
+    catCtx.moveTo(baseX + sway * 0.3, 0);
+    catCtx.quadraticCurveTo(baseX - sway, H * 0.5, baseX + sway * 0.5, H);
+    catCtx.strokeStyle = `rgba(191, 0, 255, ${0.04 + Math.sin(time + rib.phase)*0.02})`;
+    catCtx.lineWidth = 2;
+    catCtx.stroke();
+
+    catCtx.beginPath();
+    catCtx.moveTo(baseX + sway * 0.3 + 30, 0);
+    catCtx.quadraticCurveTo(baseX - sway + 30, H * 0.5, baseX + sway * 0.5 + 30, H);
+    catCtx.strokeStyle = `rgba(255, 20, 147, ${0.03 + Math.cos(time + rib.phase)*0.015})`;
+    catCtx.lineWidth = 1.5;
+    catCtx.stroke();
+  }
+  catCtx.restore();
+
+  // Light rays from mouse influence
+  catCtx.save();
+  catCtx.globalCompositeOperation = 'screen';
+  for (const ray of lightRays) {
+    const rx = (ray.x + (mouseX/W - 0.5) * 0.2) * W;
+    const intensity = 0.06 + Math.sin(time * ray.speed + ray.phase) * 0.03;
+    const grad = catCtx.createLinearGradient(rx - ray.width/2, 0, rx + ray.width/2, H);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(0.5, `hsla(${ray.hue}, 100%, 60%, ${intensity})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    catCtx.fillStyle = grad;
+    catCtx.beginPath();
+    catCtx.moveTo(rx - ray.width/2, 0);
+    catCtx.lineTo(rx + ray.width/2, 0);
+    catCtx.lineTo(rx + ray.width * 1.5, H);
+    catCtx.lineTo(rx - ray.width * 0.5, H);
+    catCtx.closePath();
+    catCtx.fill();
+  }
+  catCtx.restore();
+
+  // Rose window silhouette hint at top center
+  catCtx.save();
+  catCtx.globalCompositeOperation = 'screen';
+  const rwX = W / 2 + (mouseX - W/2) * 0.05;
+  const rwY = H * 0.12;
+  const rwR = Math.min(W, H) * 0.1;
+  catCtx.beginPath();
+  catCtx.arc(rwX, rwY, rwR, 0, Math.PI * 2);
+  catCtx.strokeStyle = `rgba(255, 20, 147, ${0.08 + Math.sin(time * 0.5) * 0.04})`;
+  catCtx.lineWidth = 1.5;
+  catCtx.stroke();
+  for (let a = 0; a < 8; a++) {
+    const ang = (a / 8) * Math.PI * 2 + time * 0.1;
+    catCtx.beginPath();
+    catCtx.moveTo(rwX, rwY);
+    catCtx.lineTo(rwX + Math.cos(ang) * rwR, rwY + Math.sin(ang) * rwR);
+    catCtx.strokeStyle = `rgba(191, 0, 255, 0.06)`;
+    catCtx.lineWidth = 1;
+    catCtx.stroke();
+  }
+  catCtx.restore();
+
+  requestAnimationFrame(drawCathedral);
+}
+drawCathedral();
+
+/* ========== KINTSUGI SVG ANIMATION ========== */
+const cracks = document.querySelectorAll('.kintsugi-crack');
+cracks.forEach((crack, i) => {
+  const length = crack.getTotalLength ? crack.getTotalLength() : 1000;
+  crack.style.strokeDasharray = length;
+  crack.style.strokeDashoffset = length;
+  gsap.to(crack, {
+    strokeDashoffset: 0,
+    duration: 2.5 + Math.random() * 2,
+    delay: i * 0.3,
+    ease: 'power2.out'
+  });
+  // Pulsing glow
+  gsap.to(crack, {
+    opacity: 0.4 + Math.random() * 0.4,
+    duration: 1.5 + Math.random(),
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut',
+    delay: Math.random() * 2
+  });
+});
+
+/* ========== PARTICLE SYSTEM ========== */
+const pCanvas = document.getElementById('particle-canvas');
+const pCtx = pCanvas.getContext('2d');
+let pW, pH;
+function resizeParticles() {
+  pW = pCanvas.width = window.innerWidth;
+  pH = pCanvas.height = window.innerHeight;
+}
+resizeParticles();
+window.addEventListener('resize', resizeParticles);
+
+class Particle {
+  constructor(type, x, y) {
+    this.type = type; // 'ash' or 'petal'
+    this.spawned = x != null && y != null;
+    this.reset(x, y);
+  }
+
+  reset(sx, sy) {
+    if (sx != null && sy != null) {
+      this.x = sx;
+      this.y = sy;
+    } else {
+      this.x = Math.random() * pW;
+      this.y = Math.random() * pH;
+    }
+    if (this.type === 'ash') {
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = -0.1 - Math.random() * 0.4;
+      this.size = 0.5 + Math.random() * 2;
+      this.alpha = 0.2 + Math.random() * 0.5;
+      this.life = 200 + Math.random() * 400;
+      this.decay = 0.998;
+      this.color = Math.random() > 0.5 ? '200,200,210' : '180,160,180';
+    } else {
+      // petal
+      this.vx = (Math.random() - 0.5) * 1.2;
+      this.vy = -0.3 - Math.random() * 0.8;
+      this.size = 3 + Math.random() * 5;
+      this.alpha = 0.4 + Math.random() * 0.5;
+      this.life = 300 + Math.random() * 300;
+      this.decay = 0.997;
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.03;
+      const hues = [320, 280, 340, 300];
+      this.hue = hues[Math.floor(Math.random() * hues.length)];
+    }
+  }
+
+  update() {
+    this.x += this.vx + Math.sin(Date.now() * 0.001 + this.y * 0.01) * 0.15;
+    this.y += this.vy;
+    this.alpha *= this.decay;
+    this.life--;
+    if (this.type === 'petal') {
+      this.rotation += this.rotSpeed;
+      this.vx *= 0.999;
+    }
+    if (this.life <= 0 || this.alpha < 0.01 || this.y < -20) {
+      if (!this.spawned) this.reset();
+      else return false;
+    }
+    return true;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    if (this.type === 'ash') {
+      ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.fillStyle = `hsla(${this.hue}, 80%, 55%, ${this.alpha})`;
+      ctx.beginPath();
+      // petal shape
+      ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = `hsla(${this.hue}, 90%, 70%, ${this.alpha * 0.6})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+const particles = [];
+// Spawn initial ash
+for (let i = 0; i < 80; i++) {
+  const p = new Particle('ash');
+  p.y = Math.random() * pH;
+  particles.push(p);
+}
+// Occasional ambient petals
+for (let i = 0; i < 15; i++) {
+  const p = new Particle('petal');
+  p.y = Math.random() * pH;
+  particles.push(p);
+}
+
+function spawnPetalsAt(x, y, count = 8) {
+  for (let i = 0; i < count; i++) {
+    particles.push(new Particle('petal', x + (Math.random()-0.5)*40, y + (Math.random()-0.5)*40));
+  }
+}
+
+function animateParticles() {
+  pCtx.clearRect(0, 0, pW, pH);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const alive = particles[i].update();
+    if (!alive) {
+      particles.splice(i, 1);
+      continue;
+    }
+    particles[i].draw(pCtx);
+  }
+  // Replenish ambient ash
+  if (particles.filter(p => p.type === 'ash').length < 60 && Math.random() < 0.1) {
+    const p = new Particle('ash');
+    p.y = pH + 10;
+    particles.push(p);
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* ========== INTERACTION ========== */
+window.addEventListener('click', e => {
+  playBellChant();
+  spawnPetalsAt(e.clientX, e.clientY, 12);
+});
+
+/* ========== SCROLL ANIMATIONS ========== */
+const sections = document.querySelectorAll('.narrative-section');
+sections.forEach(sec => {
+  gsap.from(sec.querySelector('.section-number'), {
+    scrollTrigger: { trigger: sec, start: 'top 80%', toggleActions: 'play none none reverse' },
+    y: 60, opacity: 0, duration: 1.2, ease: 'power3.out'
+  });
+  gsap.from(sec.querySelector('.section-title'), {
+    scrollTrigger: { trigger: sec, start: 'top 75%', toggleActions: 'play none none reverse' },
+    y: 50, opacity: 0, duration: 1, delay: 0.2, ease: 'power3.out'
+  });
+  gsap.from(sec.querySelector('.section-body'), {
+    scrollTrigger: { trigger: sec, start: 'top 70%', toggleActions: 'play none none reverse' },
+    y: 40, opacity: 0, duration: 1.2, delay: 0.4, ease: 'power2.out'
+  });
+  gsap.from(sec.querySelector('.rose-window'), {
+    scrollTrigger: { trigger: sec, start: 'top 75%', toggleActions: 'play none none reverse' },
+    scale: 0.6, opacity: 0, rotation: -30, duration: 1.4, delay: 0.3, ease: 'back.out(1.4)'
+  });
+});
+
+gsap.from('.hero-title', {
+  y: 80, opacity: 0, duration: 1.8, ease: 'power3.out', delay: 0.3
+});
+gsap.from('.hero-subtitle', {
+  y: 40, opacity: 0, duration: 1.4, ease: 'power3.out', delay: 0.8
+});
+
+// Parallax on kintsugi overlay
+gsap.to('#kintsugi-overlay', {
+  scrollTrigger: {
+    trigger: 'body',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 1
+  },
+  y: -80,
+  ease: 'none'
+});
+</script>
+</body>
+</html>
